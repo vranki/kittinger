@@ -9,15 +9,17 @@ QT       += core gui
 TARGET = kittinger
 TEMPLATE = app
 CONFIG += link_pkgconfig
-#PKGCONFIG += Qgpsmm libgps
+PKGCONFIG += gnokii
 PKGCONFIG += libgps
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    gpsmanager.cpp
+    gpsmanager.cpp \
+    smsmanager.cpp
 
 HEADERS  += mainwindow.h \
-    gpsmanager.h
+    gpsmanager.h \
+    smsmanager.h
 
 FORMS    += mainwindow.ui
 

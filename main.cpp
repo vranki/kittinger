@@ -1,6 +1,7 @@
 #include <QtGui/QApplication>
 #include "mainwindow.h"
 #include "gpsmanager.h"
+#include "smsmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,9 @@ int main(int argc, char *argv[])
     w.connect(&gpsManager, SIGNAL(longitudeChanged(double)), &w, SLOT(longitudeChanged(double)));
     w.connect(&gpsManager, SIGNAL(altitudeChanged(double)), &w, SLOT(altitudeChanged(double)));
     w.connect(&gpsManager, SIGNAL(statusChanged(GpsStatus)), &w, SLOT(statusChanged(GpsStatus)));
+
+    SMSManager smsManager;
+
     w.show();
     gpsManager.openGps();
     return a.exec();
