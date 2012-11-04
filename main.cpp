@@ -17,5 +17,7 @@ int main(int argc, char *argv[])
 
     w.show();
     gpsManager.openGps();
+    smsManager.openCellular();
+    smsManager.getRfLevel();
     return a.exec();
 }
