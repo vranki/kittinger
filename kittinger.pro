@@ -15,11 +15,15 @@ PKGCONFIG += libgps
 SOURCES += main.cpp\
         mainwindow.cpp \
     gpsmanager.cpp \
-    smsmanager.cpp
+    smsmanager.cpp \
+    logging.cpp \
+    gpssimulator.cpp
 
 HEADERS  += mainwindow.h \
     gpsmanager.h \
-    smsmanager.h
+    smsmanager.h \
+    logging.h \
+    gpssimulator.h
 
 FORMS    += mainwindow.ui
 

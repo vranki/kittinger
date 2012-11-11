@@ -29,7 +29,7 @@ void SMSManager::openCellular()
         qDebug() << Q_FUNC_INFO << "error loading phone profile:" << gn_error_print(error);
         return;
     }
-    qDebug() << Q_FUNC_INFO << "phone opened successfully";
+    qDebug() << Q_FUNC_INFO << "phone profile opened successfully";
 }
 
 void SMSManager::getRfLevel() {

@@ -2,11 +2,16 @@
 #include "mainwindow.h"
 #include "gpsmanager.h"
 #include "smsmanager.h"
+#include "gpssimulator.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+
+    GpsSimulator gpsSim;
+
+    MainWindow w(0, &gpsSim);
+
     GPSManager gpsManager;
     w.connect(&gpsManager, SIGNAL(latitudeChanged(double)), &w, SLOT(latitudeChanged(double)));
     w.connect(&gpsManager, SIGNAL(longitudeChanged(double)), &w, SLOT(longitudeChanged(double)));
@@ -14,6 +19,8 @@ int main(int argc, char *argv[])
     w.connect(&gpsManager, SIGNAL(statusChanged(GpsStatus)), &w, SLOT(statusChanged(GpsStatus)));
 
     SMSManager smsManager;
+
+
 
     w.show();
     gpsManager.openGps();
