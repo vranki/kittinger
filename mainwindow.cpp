@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "gpssimulator.h"
+#include <QWebFrame>
 
 MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim) :
     QMainWindow(parent),
@@ -16,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim) :
 
     connect(ui->latEdit, SIGNAL(textChanged(QString)), this, SLOT(setLat(QString)));
     connect(ui->lonEdit, SIGNAL(textChanged(QString)), this, SLOT(setLon(QString)));
-    connect(ui->lonEdit, SIGNAL(textChanged(QString)), this, SLOT(setAlt(QString)));
+    connect(ui->altEdit, SIGNAL(textChanged(QString)), this, SLOT(setAlt(QString)));
     connect(ui->simStatusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setStatus(int)));
 
     setLat(ui->latEdit->text());
@@ -43,11 +44,13 @@ void MainWindow::statusChanged(GpsStatus status)
 void MainWindow::latitudeChanged(double lat)
 {
     ui->latLabel->setText(QString::number(lat));
+    updateMap();
 }
 
 void MainWindow::longitudeChanged(double lon)
 {
     ui->lonLabel->setText(QString::number(lon));
+    updateMap();
 }
 
 void MainWindow::altitudeChanged(double alt)
@@ -73,4 +76,11 @@ void MainWindow::setAlt(QString alt)
 void MainWindow::setStatus(int s)
 {
     sim->setStatus((GpsStatus) s);
+}
+
+void MainWindow::updateMap()
+{
+    QString posString = QString("%1,%2").arg(ui->latLabel->text(), ui->lonLabel->text());
+    QString sizeString = QString("%1x%2").arg(ui->mapWebView->width()).arg(ui->mapWebView->height());
+    ui->mapWebView->page()->mainFrame()->evaluateJavaScript("showPosition('" + posString + "', '" + sizeString + "'); null");
 }

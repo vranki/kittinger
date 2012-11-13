@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui webkit
 
 TARGET = kittinger
 TEMPLATE = app
@@ -27,4 +27,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-OTHER_FILES += README.txt
+OTHER_FILES += README.txt *.html
+
+RESOURCES += \
+    resources.qrc

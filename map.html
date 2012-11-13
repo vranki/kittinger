@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function showPosition(latlon, size) {
+var img_url="http://maps.googleapis.com/maps/api/staticmap?center="+latlon+"&zoom=5&size=" + size + "&sensor=false&markers=color:blue%7Clabel:%7C" + latlon;
+  document.getElementById("mapholder").innerHTML="<img src='"+img_url+"'>";
+  }
+</script>
+</head>
+<body onload="showPosition('0,0', '100x100')">
+<div id="mapholder"></div>
+</body>
+</html>
+

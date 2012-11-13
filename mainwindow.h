@@ -30,6 +30,7 @@ private slots:
     void setLon(QString lon);
     void setAlt(QString alt);
     void setStatus(int s);
+    void updateMap();
 private:
     Ui::MainWindow *ui;
     Logging logging;
