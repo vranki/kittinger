@@ -9,7 +9,6 @@ QT       += core gui webkit
 TARGET = kittinger
 TEMPLATE = app
 CONFIG += link_pkgconfig
-PKGCONFIG += gnokii
 PKGCONFIG += libgps
 
 SOURCES += main.cpp\
@@ -17,15 +16,20 @@ SOURCES += main.cpp\
     gpsmanager.cpp \
     smsmanager.cpp \
     logging.cpp \
-    gpssimulator.cpp
+    gpssimulator.cpp \
+    flightcontrol.cpp \
+    settingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     gpsmanager.h \
     smsmanager.h \
     logging.h \
-    gpssimulator.h
+    gpssimulator.h \
+    flightcontrol.h \
+    settingsdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    settingsdialog.ui
 
 OTHER_FILES += README.txt *.html
 

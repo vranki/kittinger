@@ -8,11 +8,11 @@ class Logging : public QObject
 {
     Q_OBJECT
 public:
-    explicit Logging(QTextEdit *te);
-    void log(QString text);
+    explicit Logging();
+    void setTextEdit(QTextEdit *te);
 signals:
-    
 public slots:
+    void log(QString text);
 private:
     QTextEdit *textEdit;
 };

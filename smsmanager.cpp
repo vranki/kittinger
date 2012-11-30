@@ -1,97 +1,89 @@
 #include "smsmanager.h"
-#include <gnokii.h>
 #include <QDebug>
 
-// http://git.savannah.gnu.org/cgit/gnokii/gnokii-extras.git/tree/snippets/sms/sms_status.c
-
 SMSManager::SMSManager(QObject *parent) : QObject(parent) {
-
+    setObjectName("SMSManager");
+    connect(&gnokii, SIGNAL(started()), this, SLOT(gnokiiStarted()));
+    connect(&gnokii, SIGNAL(finished(int)), this, SLOT(gnokiiFinished()));
+    connect(&gnokii, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    gnokii.setProcessChannelMode(QProcess::MergedChannels);
+    simulate = true;
 }
 
 SMSManager::~SMSManager()
 {
-    gn_lib_phone_close(state);
-    gn_lib_phoneprofile_free(&state);
-    gn_lib_library_free();
+    emit ready(true);
+    gnokii.write("");
+    gnokii.kill();
+    gnokii.waitForFinished();
 }
 
 void SMSManager::openCellular()
 {
-    qDebug() << Q_FUNC_INFO << "Initializing gnokii " << gn_lib_version();
-    state = 0;
-    gn_error error = gn_lib_init();
-    if(error != GN_ERR_NONE){
-        qDebug() << Q_FUNC_INFO << "error initializing gnokii";
-        return;
-    }
-    error = gn_lib_phoneprofile_load(NULL, &state);
-    if(error != GN_ERR_NONE) {
-        qDebug() << Q_FUNC_INFO << "error loading phone profile:" << gn_error_print(error);
-        return;
-    }
-    qDebug() << Q_FUNC_INFO << "phone profile opened successfully";
+    gnokii.start("gnokii --identify");
+    gnokii.waitForStarted(1000);
+    gnokii.waitForFinished();
 }
 
 void SMSManager::getRfLevel() {
-    gn_error error;
-    gn_data data;
-    float rfLevel = 0;
-    gn_rf_unit rfUnit;
-    gn_data_clear(&data);
-    data.rf_level = &rfLevel;
-    data.rf_unit = &rfUnit;
-
-    error = gn_sm_functions(GN_OP_GetRFLevel, &data, state);
-    if (error == GN_ERR_NONE) {
-        qDebug() << Q_FUNC_INFO << "RF Level: " << rfLevel;
-    } else {
-        qDebug() << Q_FUNC_INFO << "error getting RF level:" << gn_error_print(error);
-    }
+    gnokii.start("gnokii --monitor once\n");
+    gnokii.waitForStarted(1000);
+    gnokii.waitForBytesWritten(100);
+    gnokii.waitForFinished();
 }
 
-void SMSManager::sendSms(QString number, QString message, bool simulate)
-{
-    gn_error error;
-    gn_data data;
-    gn_sms sms;
-    gn_sms_default_submit(&sms);
-    gn_data_clear(&data);
-    memset(&sms.remote.number, 0, sizeof(sms.remote.number));
-    strncpy(sms.remote.number, number.toAscii(), sizeof(sms.remote.number) - 1);
-    if (sms.remote.number[0] == '+')
-            sms.remote.type = GN_GSM_NUMBER_International;
-    else
-            sms.remote.type = GN_GSM_NUMBER_Unknown;
-
-    sms.delivery_report = true;
-
-    char message_buffer[255 * GN_SMS_MAX_LENGTH];
-    strcpy(message_buffer, message.toAscii());
-    strcpy((char*) sms.user_data[0].u.text, message_buffer);
-
-    if (!sms.smsc.number[0]) {
-            data.message_center = (gn_sms_message_center *) calloc(1, sizeof(gn_sms_message_center));
-            data.message_center->id = 1;
-            if (gn_sm_functions(GN_OP_GetSMSCenter, &data, state) == GN_ERR_NONE) {
-                    strcpy(sms.smsc.number, data.message_center->smsc.number);
-                    sms.smsc.type = data.message_center->smsc.type;
-            }
-            free(data.message_center);
+void SMSManager::sendSms(QString message) {
+    if(number.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << "SMS Number not set! Not sending!";
+        return;
     }
+    QString cmd = "gnokii --sendsms " + number;
+    qDebug() << Q_FUNC_INFO << cmd << message << (simulate ? "SIMULATED" : "Real");
+    if(simulate)
+        return;
+    gnokii.start(cmd);
+    gnokii.waitForStarted(1000);
+    QByteArray msg = message.toUtf8() + "\n";
+    gnokii.write(msg);
+    gnokii.closeWriteChannel();
+    bool finishedInTime = gnokii.waitForFinished(5000);
+    if(!finishedInTime)
+        emit smsSendFailed();
+    gnokii.kill();
+}
 
-    if (!sms.smsc.type) sms.smsc.type = GN_GSM_NUMBER_Unknown;
+void SMSManager::setSmsNumber(QString num)
+{
+    number = num;
+}
 
-    sms.user_data[0].type = GN_SMS_DATA_Text;
-    if (!gn_char_def_alphabet(sms.user_data[0].u.text))
-            sms.dcs.u.general.alphabet = GN_SMS_DCS_UCS2;
-    sms.user_data[1].type = GN_SMS_DATA_None;
+void SMSManager::setSimulate(bool sim)
+{
+    simulate = sim;
+}
 
-    data.sms = &sms;
-    error = gn_sms_send(&data, state);
+void SMSManager::gnokiiStarted() {
+    qDebug() << Q_FUNC_INFO << "Gnokii started ";
+    emit ready(true);
+}
 
-    if (error == GN_ERR_NONE) {
-        qDebug() << Q_FUNC_INFO << "SMS Sent";
-    } else {
-        qDebug() << Q_FUNC_INFO << "error sending sms:" << gn_error_print(error);
+void SMSManager::gnokiiFinished() {
+    qDebug() << Q_FUNC_INFO << "Gnokii finished, code " << gnokii.exitCode() << gnokii.readAllStandardOutput()<< gnokii.readAllStandardError();
+}
+
+void SMSManager::readyRead()
+{
+    if(!gnokii.canReadLine()) return;
+
+    QString line = gnokii.readLine();
+    qDebug() << Q_FUNC_INFO << "line:" << line.trimmed();
+    if(line.startsWith("RFLevel: ")) {
+        QString levelString = line.mid(9);
+        qDebug() << Q_FUNC_INFO << "RF Level: " << levelString;
+        int level = -1;
+        bool ok;
+        level = levelString.toInt(&ok);
+        if(ok)
+            emit rfLevel(level);
     }
 }

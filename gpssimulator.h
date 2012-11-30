@@ -16,9 +16,7 @@ public:
     void setStatus(GpsStatus status);
 signals:
     void statusChanged(GpsStatus status);
-    void latitudeChanged(double lat);
-    void longitudeChanged(double lon);
-    void altitudeChanged(double alt);
+    void gpsFix(double lat, double lon, double alt);
 public slots:
     void enable(bool enabled);
 private slots:

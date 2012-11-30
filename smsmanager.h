@@ -2,6 +2,8 @@
 #define SMSMANAGER_H
 
 #include <QObject>
+#include <QProcess>
+#include <QTimer>
 
 class SMSManager : public QObject
 {
@@ -11,13 +13,22 @@ public:
     ~SMSManager();
     void openCellular();
     void getRfLevel();
-    void sendSms(QString number, QString message, bool simulate);
-signals:
-    
+    void setSmsNumber(QString num);
+    void setSimulate(bool sim);
 public slots:
-    
+    void sendSms(QString message);
+signals:
+    void ready(bool isready);
+    void rfLevel(int level);
+    void smsSendFailed();
+private slots:
+    void gnokiiStarted();
+    void gnokiiFinished();
+    void readyRead();
 private:
-    struct gn_statemachine *state;
+    QProcess gnokii;
+    QString number;
+    bool simulate;
 };
 
 #endif // SMSMANAGER_H

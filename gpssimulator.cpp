@@ -3,6 +3,7 @@
 GpsSimulator::GpsSimulator(QObject *parent) :
     QObject(parent)
 {
+    setObjectName("GPSSimulator");
     enabled = false;
     timer.setSingleShot(false);
     timer.setInterval(1000);
@@ -46,7 +47,5 @@ void GpsSimulator::enable(bool enabled)
 
 void GpsSimulator::tick()
 {
-    emit latitudeChanged(lat);
-    emit longitudeChanged(lon);
-    emit altitudeChanged(alt);
+    emit gpsFix(lat, lon, alt);
 }

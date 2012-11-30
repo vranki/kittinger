@@ -3,6 +3,7 @@
 #include <QDebug>
 
 GPSManager::GPSManager(QObject *parent) : QObject(parent), gps_rec(0) {
+    setObjectName("GPSManager");
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(pollGps()));
     pollTimer.setInterval(10);
     pollTimer.setSingleShot(false);
@@ -20,15 +21,28 @@ void GPSManager::openGps()
     lastLatitude = lastLongitude = lastAltitude = 0;
 
     emit statusChanged(lastStatus);
-    emit latitudeChanged(NAN);
-    emit longitudeChanged(NAN);
-    emit altitudeChanged(NAN);
+    emit gpsFix(NAN, NAN, NAN);
 
     if (!gps_rec->stream(WATCH_ENABLE|WATCH_JSON)) {
         qDebug() << "No GPSD running.";
         return;
     }
     pollTimer.start();
+}
+
+QString GPSManager::statusString(GpsStatus status)
+{
+    switch(status) {
+    case STATUS_NO_FIX:
+        return "NOFIX";
+    case STATUS_SET:
+        return "SET";
+    case STATUS_DGPS_FIX:
+        return "DGPS";
+    case STATUS_FIX:
+        return "FIX";
+    }
+    return "?";
 }
 
 void GPSManager::pollGps()
@@ -50,18 +64,10 @@ void GPSManager::processData(gps_data_t *data)
         lastStatus = data->status;
         emit statusChanged(lastStatus);
     }
-    if(lastLatitude != data->fix.latitude) {
+    if(lastLatitude != data->fix.latitude || lastLongitude != data->fix.longitude || lastAltitude != data->fix.altitude) {
         lastLatitude = data->fix.latitude;
-        emit latitudeChanged(lastLatitude);
-    }
-    if(lastLongitude != data->fix.longitude) {
         lastLongitude = data->fix.longitude;
-        emit longitudeChanged(lastLongitude);
-    }
-    if(lastAltitude != data->fix.altitude) {
         lastAltitude = data->fix.altitude;
-        emit altitudeChanged(lastAltitude);
+        emit gpsFix(lastLatitude, lastLongitude, lastAltitude);
     }
-//    qDebug() << "status " << data->status << "fix " << data->fix.latitude << data->fix.longitude << data->fix.altitude;
-
 }

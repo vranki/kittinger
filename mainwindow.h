@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSettings>
 #include <QtGui/QTextEdit>
 #include "gpsmanager.h"
 #include "logging.h"
@@ -17,24 +18,27 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent, GpsSimulator *gsim);
+    explicit MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set);
     ~MainWindow();
     Logging* log();
 public slots:
     void statusChanged(GpsStatus status);
-    void latitudeChanged(double lat);
-    void longitudeChanged(double lon);
-    void altitudeChanged(double alt);
+    void gpsFix(double lat, double lon, double alt);
+    void rfLevelChanged(int rfl);
+signals:
+    void sendStatus();
 private slots:
     void setLat(QString lat);
     void setLon(QString lon);
     void setAlt(QString alt);
     void setStatus(int s);
     void updateMap();
+    void openSettings();
 private:
     Ui::MainWindow *ui;
     Logging logging;
     GpsSimulator *sim;
+    QSettings &settings;
 };
 
 #endif // MAINWINDOW_H

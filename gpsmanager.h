@@ -16,11 +16,10 @@ public:
     explicit GPSManager(QObject *parent = 0);
     ~GPSManager();
     void openGps();
+    static QString statusString(GpsStatus status);
 signals:
     void statusChanged(GpsStatus status);
-    void latitudeChanged(double lat);
-    void longitudeChanged(double lon);
-    void altitudeChanged(double alt);
+    void gpsFix(double lat, double lon, double alt);
 public slots:
     
 private slots:

@@ -2,23 +2,26 @@
 #include "ui_mainwindow.h"
 #include "gpssimulator.h"
 #include <QWebFrame>
+#include "settingsdialog.h"
 
-MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim) :
+MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow), logging(ui->logTextEdit), sim(gsim)
-{
+    ui(new Ui::MainWindow), sim(gsim), settings(set) {
     ui->setupUi(this);
+    logging.setTextEdit(ui->logTextEdit);
     connect(ui->gpsSimEnable, SIGNAL(toggled(bool)), sim, SLOT(enable(bool)));
 
-    connect(sim, SIGNAL(latitudeChanged(double)), this, SLOT(latitudeChanged(double)));
-    connect(sim, SIGNAL(longitudeChanged(double)), this, SLOT(longitudeChanged(double)));
-    connect(sim, SIGNAL(altitudeChanged(double)), this, SLOT(altitudeChanged(double)));
+    connect(sim, SIGNAL(gpsFix(double,double,double)), this, SLOT(gpsFix(double,double,double)));
     connect(sim, SIGNAL(statusChanged(GpsStatus)), this, SLOT(statusChanged(GpsStatus)));
 
     connect(ui->latEdit, SIGNAL(textChanged(QString)), this, SLOT(setLat(QString)));
     connect(ui->lonEdit, SIGNAL(textChanged(QString)), this, SLOT(setLon(QString)));
     connect(ui->altEdit, SIGNAL(textChanged(QString)), this, SLOT(setAlt(QString)));
     connect(ui->simStatusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setStatus(int)));
+
+    connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(openSettings()));
+
+    connect(ui->sendStatusButton, SIGNAL(clicked()), this, SIGNAL(sendStatus()));
 
     setLat(ui->latEdit->text());
     setLon(ui->lonEdit->text());
@@ -41,21 +44,17 @@ void MainWindow::statusChanged(GpsStatus status)
     // log()->log("Status changed: " + QString::number(status));
 }
 
-void MainWindow::latitudeChanged(double lat)
+void MainWindow::gpsFix(double lat, double lon, double alt)
 {
     ui->latLabel->setText(QString::number(lat));
-    updateMap();
-}
-
-void MainWindow::longitudeChanged(double lon)
-{
     ui->lonLabel->setText(QString::number(lon));
+    ui->altLabel->setText(QString::number(alt));
     updateMap();
 }
 
-void MainWindow::altitudeChanged(double alt)
+void MainWindow::rfLevelChanged(int rfl)
 {
-    ui->altLabel->setText(QString::number(alt));
+    ui->rfLevelLabel->setText(QString::number(rfl));
 }
 
 void MainWindow::setLat(QString lat)
@@ -83,4 +82,11 @@ void MainWindow::updateMap()
     QString posString = QString("%1,%2").arg(ui->latLabel->text(), ui->lonLabel->text());
     QString sizeString = QString("%1x%2").arg(ui->mapWebView->width()).arg(ui->mapWebView->height());
     ui->mapWebView->page()->mainFrame()->evaluateJavaScript("showPosition('" + posString + "', '" + sizeString + "'); null");
+}
+
+void MainWindow::openSettings()
+{
+    SettingsDialog *sd = new SettingsDialog(this, settings);
+    sd->exec();
+    sd->deleteLater();
 }
