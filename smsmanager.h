@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QTimer>
+#include <QStringList>
 
 class SMSManager : public QObject
 {
@@ -12,23 +13,26 @@ public:
     explicit SMSManager(QObject *parent = 0);
     ~SMSManager();
     void openCellular();
-    void getRfLevel();
     void setSmsNumber(QString num);
     void setSimulate(bool sim);
 public slots:
     void sendSms(QString message);
+    void pollStatus();
+    void injectSms(QString message); // As if it is received, for testing
 signals:
     void ready(bool isready);
     void rfLevel(int level);
     void smsSendFailed();
+    void messageReceived(QString message);
 private slots:
-    void gnokiiStarted();
-    void gnokiiFinished();
-    void readyRead();
+
 private:
+    void getMessages();
+
     QProcess gnokii;
     QString number;
-    bool simulate;
+    bool simulate, deviceAvailable;
+    QStringList injectedMessages;
 };
 
 #endif // SMSMANAGER_H

@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set) :
 
     connect(ui->sendStatusButton, SIGNAL(clicked()), this, SIGNAL(sendStatus()));
 
+    connect(ui->sendSmsButton, SIGNAL(clicked()), this, SLOT(sendSms()));
+
     setLat(ui->latEdit->text());
     setLon(ui->lonEdit->text());
     setAlt(ui->altEdit->text());
@@ -89,4 +91,9 @@ void MainWindow::openSettings()
     SettingsDialog *sd = new SettingsDialog(this, settings);
     sd->exec();
     sd->deleteLater();
+}
+
+void MainWindow::sendSms()
+{
+    emit injectSms(ui->injectMessageEdit->text());
 }

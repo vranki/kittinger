@@ -26,16 +26,19 @@ int main(int argc, char *argv[])
 
     SMSManager smsManager;
     w.connect(&smsManager, SIGNAL(rfLevel(int)), &w, SLOT(rfLevelChanged(int)));
+    w.connect(&smsManager, SIGNAL(messageReceived(QString)), w.log(), SLOT(log(QString)));
+    w.connect(&w, SIGNAL(injectSms(QString)), &smsManager, SLOT(injectSms(QString)));
 
     w.show();
-    gpsManager.openGps();
-    smsManager.openCellular();
-    smsManager.getRfLevel();
+
     smsManager.setSmsNumber(settings.value(SMS_NUMBER_KEY).toString());
     smsManager.setSimulate(settings.value(SIMULATE_KEY).toBool());
 
     FlightControl fc;
     fc.connect(&fc, SIGNAL(sendSms(QString)), &smsManager, SLOT(sendSms(QString)));
+    fc.connect(&fc, SIGNAL(pollGsm()), &smsManager, SLOT(pollStatus()));
+    fc.connect(&smsManager, SIGNAL(rfLevel(int)), &fc, SLOT(rfLevel(int)));
+    fc.connect(&smsManager, SIGNAL(messageReceived(QString)), &fc, SLOT(messageReceived(QString)));
     fc.connect(&w, SIGNAL(sendStatus()), &fc, SLOT(sendStatus()));
     fc.connect(&gpsManager, SIGNAL(gpsFix(double,double,double)), &fc, SLOT(gpsFix(double,double,double)));
     fc.connect(&gpsManager, SIGNAL(statusChanged(GpsStatus)), &fc, SLOT(statusChanged(GpsStatus)));
@@ -44,6 +47,9 @@ int main(int argc, char *argv[])
     fc.connect(&gpsSim, SIGNAL(statusChanged(GpsStatus)), &fc, SLOT(statusChanged(GpsStatus)));
 
     fc.connect(&fc, SIGNAL(log(QString)), w.log(), SLOT(log(QString)));
+
+    gpsManager.openGps();
+    smsManager.openCellular();
 
     return a.exec();
 }

@@ -204,17 +204,27 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="0" column="1">
+          <widget class="QLabel" name="rfLevelLabel">
+           <property name="text">
+            <string>?</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
           <widget class="QPushButton" name="sendStatusButton">
            <property name="text">
             <string>Send Status</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="rfLevelLabel">
+         <item row="1" column="0">
+          <widget class="QLineEdit" name="injectMessageEdit"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="sendSmsButton">
            <property name="text">
-            <string>?</string>
+            <string>Send SMS</string>
            </property>
           </widget>
          </item>

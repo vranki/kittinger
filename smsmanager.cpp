@@ -3,16 +3,13 @@
 
 SMSManager::SMSManager(QObject *parent) : QObject(parent) {
     setObjectName("SMSManager");
-    connect(&gnokii, SIGNAL(started()), this, SLOT(gnokiiStarted()));
-    connect(&gnokii, SIGNAL(finished(int)), this, SLOT(gnokiiFinished()));
-    connect(&gnokii, SIGNAL(readyRead()), this, SLOT(readyRead()));
     gnokii.setProcessChannelMode(QProcess::MergedChannels);
     simulate = true;
+    deviceAvailable = false;
 }
 
-SMSManager::~SMSManager()
-{
-    emit ready(true);
+SMSManager::~SMSManager() {
+    emit ready(false);
     gnokii.write("");
     gnokii.kill();
     gnokii.waitForFinished();
@@ -23,13 +20,77 @@ void SMSManager::openCellular()
     gnokii.start("gnokii --identify");
     gnokii.waitForStarted(1000);
     gnokii.waitForFinished();
+    while(gnokii.canReadLine()) {
+        QString line = gnokii.readLine();
+        if(line.startsWith("IMEI")) {
+            deviceAvailable = true;
+            qDebug() << Q_FUNC_INFO << "Device is available";
+        }
+    }
+    if(!deviceAvailable)
+        qDebug() << Q_FUNC_INFO << "Warning: Device is available";
+    emit ready(deviceAvailable);
 }
 
-void SMSManager::getRfLevel() {
+void SMSManager::pollStatus() {
     gnokii.start("gnokii --monitor once\n");
     gnokii.waitForStarted(1000);
-    gnokii.waitForBytesWritten(100);
-    gnokii.waitForFinished();
+    gnokii.waitForFinished(1000);
+    bool newMessagesAvailable = false;
+    while(gnokii.canReadLine()) {
+        QString line = gnokii.readLine();
+        if(line.startsWith("RFLevel: ")) {
+            QString levelString = line.mid(9);
+            qDebug() << Q_FUNC_INFO << "RF Level: " << levelString;
+            int level = -1;
+            bool ok;
+            level = levelString.toInt(&ok);
+            if(ok)
+                emit rfLevel(level);
+        } else if(line.startsWith("SMS Messages:")) {
+            QString numberString = line.mid(line.lastIndexOf(" "));
+            int smsms = numberString.toInt();
+            newMessagesAvailable = smsms > 1; // For some reason always 1
+        }
+    }
+    if(newMessagesAvailable)
+        getMessages();
+    foreach(QString msg, injectedMessages)
+        emit messageReceived(msg);
+    injectedMessages.clear();
+}
+
+void SMSManager::injectSms(QString message) {
+    injectedMessages.append(message);
+}
+
+void SMSManager::getMessages() {
+    gnokii.start("gnokii --getsms ME 0");
+    gnokii.waitForStarted(1000);
+    gnokii.waitForFinished(1000);
+    bool readingMessage = false;
+    QString message;
+    while(gnokii.canReadLine()) {
+        QString line = gnokii.readLine();
+        if(readingMessage) {
+            message += line;
+        }
+        if(line.startsWith("Text:")) {
+            if(!message.isEmpty()) {
+                emit messageReceived(message.trimmed().toLower());
+                message = "";
+                readingMessage = false;
+            }
+            readingMessage = true;
+            message = "";
+        }
+    }
+    if(!message.isEmpty()) {
+        emit messageReceived(message.trimmed().toLower());
+    }
+    gnokii.start("gnokii --deletesms ME 0");
+    gnokii.waitForStarted(1000);
+    gnokii.waitForFinished(1000);
 }
 
 void SMSManager::sendSms(QString message) {
@@ -60,30 +121,4 @@ void SMSManager::setSmsNumber(QString num)
 void SMSManager::setSimulate(bool sim)
 {
     simulate = sim;
-}
-
-void SMSManager::gnokiiStarted() {
-    qDebug() << Q_FUNC_INFO << "Gnokii started ";
-    emit ready(true);
-}
-
-void SMSManager::gnokiiFinished() {
-    qDebug() << Q_FUNC_INFO << "Gnokii finished, code " << gnokii.exitCode() << gnokii.readAllStandardOutput()<< gnokii.readAllStandardError();
-}
-
-void SMSManager::readyRead()
-{
-    if(!gnokii.canReadLine()) return;
-
-    QString line = gnokii.readLine();
-    qDebug() << Q_FUNC_INFO << "line:" << line.trimmed();
-    if(line.startsWith("RFLevel: ")) {
-        QString levelString = line.mid(9);
-        qDebug() << Q_FUNC_INFO << "RF Level: " << levelString;
-        int level = -1;
-        bool ok;
-        level = levelString.toInt(&ok);
-        if(ok)
-            emit rfLevel(level);
-    }
 }

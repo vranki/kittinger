@@ -27,6 +27,7 @@ public slots:
     void rfLevelChanged(int rfl);
 signals:
     void sendStatus();
+    void injectSms(QString msg);
 private slots:
     void setLat(QString lat);
     void setLon(QString lon);
@@ -34,6 +35,7 @@ private slots:
     void setStatus(int s);
     void updateMap();
     void openSettings();
+    void sendSms();
 private:
     Ui::MainWindow *ui;
     Logging logging;
