@@ -31,7 +31,8 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     settingsdialog.ui
 
-OTHER_FILES += README.txt *.html
+OTHER_FILES += README.txt *.html \
+    99-usb-serial.rules
 
 RESOURCES += \
     resources.qrc

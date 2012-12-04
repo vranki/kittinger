@@ -47,9 +47,10 @@ int main(int argc, char *argv[])
     fc.connect(&gpsSim, SIGNAL(statusChanged(GpsStatus)), &fc, SLOT(statusChanged(GpsStatus)));
 
     fc.connect(&fc, SIGNAL(log(QString)), w.log(), SLOT(log(QString)));
-
+    fc.connect(&fc, SIGNAL(flightStateChanged(FlightControl::FlightState)), &w, SLOT(flightStateChanged(FlightControl::FlightState)));
+    fc.connect(&fc, SIGNAL(variometerChanged(double)), &w, SLOT(variometerChanged(double)));
     gpsManager.openGps();
     smsManager.openCellular();
-
+    fc.reset();
     return a.exec();
 }

@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set) :
 
     connect(ui->latEdit, SIGNAL(textChanged(QString)), this, SLOT(setLat(QString)));
     connect(ui->lonEdit, SIGNAL(textChanged(QString)), this, SLOT(setLon(QString)));
-    connect(ui->altEdit, SIGNAL(textChanged(QString)), this, SLOT(setAlt(QString)));
+    connect(ui->altEdit, SIGNAL(valueChanged(int)), this, SLOT(setAlt(int)));
     connect(ui->simStatusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setStatus(int)));
 
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(openSettings()));
@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set) :
 
     setLat(ui->latEdit->text());
     setLon(ui->lonEdit->text());
-    setAlt(ui->altEdit->text());
+    setAlt(ui->altEdit->value());
 }
 
 MainWindow::~MainWindow()
@@ -43,7 +43,6 @@ Logging *MainWindow::log()
 void MainWindow::statusChanged(GpsStatus status)
 {
     ui->statusCombo->setCurrentIndex((int) status);
-    // log()->log("Status changed: " + QString::number(status));
 }
 
 void MainWindow::gpsFix(double lat, double lon, double alt)
@@ -59,6 +58,16 @@ void MainWindow::rfLevelChanged(int rfl)
     ui->rfLevelLabel->setText(QString::number(rfl));
 }
 
+void MainWindow::flightStateChanged(FlightControl::FlightState newState)
+{
+    ui->phaseLabel->setText(FlightControl::stateName(newState));
+}
+
+void MainWindow::variometerChanged(double vario)
+{
+    ui->variometerValue->setText(QString::number(vario));
+}
+
 void MainWindow::setLat(QString lat)
 {
     sim->setLat(lat.toDouble());
@@ -69,9 +78,9 @@ void MainWindow::setLon(QString lon)
     sim->setLon(lon.toDouble());
 }
 
-void MainWindow::setAlt(QString alt)
+void MainWindow::setAlt(int alt)
 {
-    sim->setAlt(alt.toDouble());
+    sim->setAlt(alt);
 }
 
 void MainWindow::setStatus(int s)
