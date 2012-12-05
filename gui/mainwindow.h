@@ -4,9 +4,9 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QtGui/QTextEdit>
-#include "gpsmanager.h"
-#include "logging.h"
-#include "flightcontrol.h"
+#include "../gpsmanager.h"
+#include "../logging.h"
+#include "../flightcontrol/flightcontrol.h"
 
 class GpsSimulator;
 
@@ -29,8 +29,8 @@ public slots:
     void flightStateChanged(FlightControl::FlightState newState);
     void variometerChanged(double vario);
 signals:
-    void sendStatus();
     void injectSms(QString msg);
+    void simRfLevelChanged(int level);
 private slots:
     void setLat(QString lat);
     void setLon(QString lon);

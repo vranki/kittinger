@@ -21,9 +21,9 @@ MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set) :
 
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(openSettings()));
 
-    connect(ui->sendStatusButton, SIGNAL(clicked()), this, SIGNAL(sendStatus()));
-
     connect(ui->sendSmsButton, SIGNAL(clicked()), this, SLOT(sendSms()));
+
+    connect(ui->simRfLevelSpinbox, SIGNAL(valueChanged(int)), this, SIGNAL(simRfLevelChanged(int)));
 
     setLat(ui->latEdit->text());
     setLon(ui->lonEdit->text());

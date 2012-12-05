@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/html">
-        <file>map.html</file>
+        <file>gui/map.html</file>
     </qresource>
 </RCC>

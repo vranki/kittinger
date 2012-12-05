@@ -4,12 +4,17 @@
 #include <QObject>
 #include <QTime>
 #include <QQueue>
-#include "gpsmanager.h"
+#include "../gpsmanager.h"
 
 #define VARIOMETER_FIXES 5
 #define VERTICAL_SPEED_DEADZONE 1
-#define MESSAGE_INTERVAL 60 // in sec
+#define MESSAGE_INTERVAL 20 // in sec
 #define GSM_POLL_INTERVAL 10*1000 // in msec
+#define GSM_POLL_ALTITUDE 1000 // in m - Altitude above which GSM has no chance of working
+#define MAX_MISSION_TIME 4*60*60*1000 // in msec
+#define ALTITUDE_ERROR_MARGIN 50 // in m - Amount of gps error allowed to assume landing
+#define MAX_GROUND_ALTITUDE 400 // in m - Landing not detected above this
+#define GPS_MAX_ALTITUDE 15000 // in m - altitude GPS should be working below
 
 class FlightControl : public QObject {
     Q_OBJECT
@@ -25,8 +30,9 @@ public:
     explicit FlightControl(QObject *parent = 0);
     void reset();
     static QString stateName(FlightControl::FlightState s);
+
 public slots:
-    void sendStatus();
+    void sendStatus(bool force=false);
     void statusChanged(GpsStatus status);
     void gpsFix(double latitude, double longitude, double altitude);
     void rfLevel(int level);
@@ -46,19 +52,30 @@ signals:
 private slots:
     void startTakeoff();
     void startAscent();
+    void startDescent();
+    void startLanded();
     void checkVario();
+    void checkForLanding();
+    void missionTimeout();
+
 private:
     void changeState(FlightState newState);
+    void reboot();
+    void poweroff();
+
     double lat, lon, alt;
     double variometer;
-    double groundLevel, highestAltitude;
+    double groundLevel, highestAltitude, landingLevel;
     int lastRfLevel;
     GpsStatus gpsStatus;
-    QTimer gsmPollTimer;
+    QTimer gsmPollTimer, sendStatusTimer;
+    QTimer detectLandingTimer, missionTimeoutTimer;
     QTime lastMessageSentTime;
-    int messageSendInterval; // In sec
+    QTime missionStartTime;
     QQueue<double> lastAltFixes;
     FlightState flightState;
+    bool initialized; // All initialized
+    bool flightFinished; // Confirmed by ground crew
 };
 
 #endif // FLIGHTCONTROL_H

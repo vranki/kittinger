@@ -2,7 +2,7 @@
 #define GPSSIMULATOR_H
 
 #include <QObject>
-#include "gpsmanager.h"
+#include "../gpsmanager.h"
 #include <QTimer>
 
 class GpsSimulator : public QObject

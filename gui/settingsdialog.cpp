@@ -1,5 +1,6 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include "../smsmanager.h"
 
 SettingsDialog::SettingsDialog(QWidget *parent, QSettings &set) :
     QDialog(parent),

@@ -6,6 +6,9 @@
 #include <QTimer>
 #include <QStringList>
 
+#define SMS_NUMBER_KEY "sms_number"
+#define SIMULATE_KEY "sms_simulate"
+
 class SMSManager : public QObject
 {
     Q_OBJECT

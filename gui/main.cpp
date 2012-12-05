@@ -2,12 +2,12 @@
 #include <QSettings>
 
 #include "mainwindow.h"
-#include "gpsmanager.h"
-#include "smsmanager.h"
+#include "../gpsmanager.h"
+#include "../smsmanager.h"
 #include "gpssimulator.h"
-#include "flightcontrol.h"
+#include "../flightcontrol/flightcontrol.h"
 #include "settingsdialog.h"
-#include "logging.h"
+#include "../logging.h"
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     fc.connect(&fc, SIGNAL(pollGsm()), &smsManager, SLOT(pollStatus()));
     fc.connect(&smsManager, SIGNAL(rfLevel(int)), &fc, SLOT(rfLevel(int)));
     fc.connect(&smsManager, SIGNAL(messageReceived(QString)), &fc, SLOT(messageReceived(QString)));
-    fc.connect(&w, SIGNAL(sendStatus()), &fc, SLOT(sendStatus()));
+    fc.connect(&w, SIGNAL(simRfLevelChanged(int)), &fc, SLOT(rfLevel(int)));
     fc.connect(&gpsManager, SIGNAL(gpsFix(double,double,double)), &fc, SLOT(gpsFix(double,double,double)));
     fc.connect(&gpsManager, SIGNAL(statusChanged(GpsStatus)), &fc, SLOT(statusChanged(GpsStatus)));
 

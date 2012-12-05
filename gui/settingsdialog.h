@@ -8,8 +8,6 @@ namespace Ui {
 class SettingsDialog;
 }
 
-#define SMS_NUMBER_KEY "sms_number"
-#define SIMULATE_KEY "sms_simulate"
 
 class SettingsDialog : public QDialog
 {

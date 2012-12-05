@@ -52,7 +52,7 @@ void GPSManager::pollGps()
     }
     struct gps_data_t* newdata = gps_rec->read();
     if (!newdata) {
-        qDebug() << "Read error";
+        qDebug() << Q_FUNC_INFO << "Read error";
     } else {
         processData(newdata);
     }

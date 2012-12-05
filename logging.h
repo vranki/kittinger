@@ -2,7 +2,8 @@
 #define LOGGING_H
 
 #include <QObject>
-#include <QtGui/QTextEdit>
+
+class QTextEdit;
 
 class Logging : public QObject
 {

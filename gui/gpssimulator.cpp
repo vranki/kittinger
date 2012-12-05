@@ -47,5 +47,6 @@ void GpsSimulator::enable(bool enabled)
 
 void GpsSimulator::tick()
 {
-    emit gpsFix(lat, lon, alt);
+    if(status != STATUS_NO_FIX)
+        emit gpsFix(lat, lon, alt);
 }

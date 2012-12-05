@@ -215,19 +215,42 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QPushButton" name="sendStatusButton">
+          <widget class="QLineEdit" name="injectMessageEdit"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="sendSmsButton">
            <property name="text">
-            <string>Send Status</string>
+            <string>Send SMS</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_7">
+        <property name="title">
+         <string>Cell simulator</string>
+        </property>
+        <layout class="QFormLayout" name="formLayout_5">
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="enableCellSimCheckbox">
+           <property name="text">
+            <string>Enable</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLineEdit" name="injectMessageEdit"/>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>RF Level</string>
+           </property>
+          </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QPushButton" name="sendSmsButton">
-           <property name="text">
-            <string>Send SMS</string>
+          <widget class="QSpinBox" name="simRfLevelSpinbox">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -252,7 +275,7 @@
        <item row="0" column="1">
         <widget class="QLabel" name="phaseLabel">
          <property name="text">
-          <string>TextLabel</string>
+          <string>?</string>
          </property>
         </widget>
        </item>
@@ -295,7 +318,7 @@
         <widget class="QWebView" name="mapWebView">
          <property name="url">
           <url>
-           <string>qrc:/html/map.html</string>
+           <string>qrc:/html/gui/map.html</string>
           </url>
          </property>
         </widget>
@@ -340,5 +363,22 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>enableCellSimCheckbox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>simRfLevelSpinbox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>744</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>812</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
