@@ -1,0 +1,22 @@
+#! /bin/sh
+# /etc/init.d/kittinger
+#
+# Copy to /etc/init.d and run update-rc.d kittinger defaults
+# To remove, use update-rc.d -f kittinger remove
+case "$1" in
+  start)
+    echo "Starting kittinger "
+    cd /home/pi/src/kittinger/flightcontrol
+    sudo -u pi ./kittinger >> /var/log/kittinger.log 2>&1 &
+    ;;
+  stop)
+    echo "Stopping kittinger"
+    killall kittinger
+    ;;
+  *)
+    echo "Usage: /etc/init.d/kittinger {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0
