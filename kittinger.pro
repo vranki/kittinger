@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS = gui flightcontrol
+SUBDIRS = gui flightcontrol setservo
 
 OTHER_FILES += README.txt *.html \
     99-usb-serial.rules

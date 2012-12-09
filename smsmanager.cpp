@@ -12,14 +12,14 @@ SMSManager::~SMSManager() {
     emit ready(false);
     gnokii.write("");
     gnokii.kill();
-    gnokii.waitForFinished();
+    gnokii.waitForFinished(5000);
 }
 
 void SMSManager::openCellular()
 {
     gnokii.start("gnokii --identify");
     gnokii.waitForStarted(1000);
-    gnokii.waitForFinished();
+    gnokii.waitForFinished(5000);
     while(gnokii.canReadLine()) {
         QString line = gnokii.readLine();
         if(line.startsWith("IMEI")) {
