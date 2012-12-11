@@ -5,6 +5,7 @@
 #include <QTime>
 #include <QQueue>
 #include "../gpsmanager.h"
+#include "../thermalcontrol.h"
 
 #define VARIOMETER_FIXES 5
 #define VERTICAL_SPEED_DEADZONE 1
@@ -76,6 +77,8 @@ private:
     FlightState flightState;
     bool initialized; // All initialized
     bool flightFinished; // Confirmed by ground crew
+
+    ThermalControl thermalControl;
 };
 
 #endif // FLIGHTCONTROL_H

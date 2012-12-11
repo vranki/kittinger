@@ -16,6 +16,8 @@ SOURCES += main.cpp\
     ../gpsmanager.cpp \
     ../smsmanager.cpp \
     ../logging.cpp \
+    ../thermalcontrol.cpp \
+    ../servocontrol.cpp \
     gpssimulator.cpp \
     ../flightcontrol/flightcontrol.cpp \
     settingsdialog.cpp
@@ -24,6 +26,8 @@ HEADERS  += mainwindow.h \
     ../gpsmanager.h \
     ../smsmanager.h \
     ../logging.h \
+    ../thermalcontrol.h \
+    ../servocontrol.h \
     gpssimulator.h \
     ../flightcontrol/flightcontrol.h \
     settingsdialog.h

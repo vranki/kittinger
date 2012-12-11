@@ -15,8 +15,7 @@ SMSManager::~SMSManager() {
     gnokii.waitForFinished(5000);
 }
 
-void SMSManager::openCellular()
-{
+void SMSManager::openCellular() {
     gnokii.start("gnokii --identify");
     gnokii.waitForStarted(1000);
     gnokii.waitForFinished(5000);
@@ -28,7 +27,7 @@ void SMSManager::openCellular()
         }
     }
     if(!deviceAvailable)
-        qDebug() << Q_FUNC_INFO << "Warning: Device is available";
+        qDebug() << Q_FUNC_INFO << "Warning: Device is not available";
     emit ready(deviceAvailable);
 }
 
