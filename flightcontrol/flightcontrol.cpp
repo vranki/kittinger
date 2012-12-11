@@ -1,22 +1,42 @@
 #include "flightcontrol.h"
 #include <cmath>
 #include <QDebug>
+#include "../smsmanager.h"
+#include "../gpsmanager.h"
+#include "../thermalcontrol.h"
+#include "../logging.h"
 
-FlightControl::FlightControl(QObject *parent) : QObject(parent) {
+FlightControl::FlightControl() : QObject() {
     setObjectName("FlightControl");
+
     connect(&gsmPollTimer, SIGNAL(timeout()), this, SIGNAL(pollGsm()));
     connect(this, SIGNAL(variometerChanged(double)), this, SLOT(checkVario()));
+
     connect(&detectLandingTimer, SIGNAL(timeout()), this, SLOT(checkForLanding()));
     detectLandingTimer.setInterval(30*1000);
     detectLandingTimer.setSingleShot(false);
+
     connect(&missionTimeoutTimer, SIGNAL(timeout()), this, SLOT(checkForLanding()));
     missionTimeoutTimer.setInterval(MAX_MISSION_TIME);
     missionTimeoutTimer.setSingleShot(true);
+
     connect(&sendStatusTimer, SIGNAL(timeout()), this, SLOT(sendStatus()));
     sendStatusTimer.setInterval(MESSAGE_INTERVAL*1000);
     sendStatusTimer.setSingleShot(false);
+
+    smsReady = gsmReady = thermalReady = false;
     reset();
     initialized = false;
+}
+
+void FlightControl::init(SMSManager *sms, GPSManager *gps) {
+    connect(this, SIGNAL(sendSms(QString)), sms, SLOT(sendSms(QString)));
+    connect(this, SIGNAL(pollGsm()), sms, SLOT(pollStatus()));
+    connect(sms, SIGNAL(rfLevel(int)), this, SLOT(rfLevel(int)));
+    connect(sms, SIGNAL(messageReceived(QString)), this, SLOT(messageReceived(QString)));
+    connect(gps, SIGNAL(gpsFix(double,double,double)), this, SLOT(gpsFix(double,double,double)));
+    connect(gps, SIGNAL(statusChanged(GpsStatus)), this, SLOT(statusChanged(GpsStatus)));
+
 }
 
 void FlightControl::reset() {
@@ -30,6 +50,8 @@ void FlightControl::reset() {
     flightFinished = false;
     initialized = true;
     lastMessageSentTime = QTime::currentTime();
+    readyForFlight = false;
+    checkReady();
     changeState(FS_TAKEOFF);
 }
 
@@ -53,8 +75,8 @@ void FlightControl::sendStatus(bool force) {
     if(!initialized) return;
 
     QString status;
-    status = QString("%1,%2,%3,%4,%5").arg(lat, 0, 'f', 6).arg(lon, 0, 'f', 6).arg(alt).arg(GPSManager::statusString(gpsStatus),
-                                                                                            stateName(flightState).left(1));
+    status = QString("%1,%2,%3,%4,%5,%6").arg(lat, 0, 'f', 6).arg(lon, 0, 'f', 6).arg(alt).arg(GPSManager::statusString(gpsStatus),
+                                                                                            stateName(flightState).left(1)).arg(readyForFlight);
     emit sendSms(status);
     log(status);
     lastMessageSentTime = QTime::currentTime();
@@ -223,6 +245,29 @@ void FlightControl::missionTimeout() {
         log("MISSION TIMEOUT - REBOOTING");
         reboot();
     }
+}
+
+void FlightControl::readyThermal(bool is) {
+    thermalReady = is;
+    checkReady();
+}
+
+void FlightControl::readySms(bool is) {
+    smsReady = is;
+    checkReady();
+}
+
+void FlightControl::readyGsm(bool is) {
+    gsmReady = is;
+    checkReady();
+}
+
+void FlightControl::checkReady() {
+    if((thermalReady && smsReady && gsmReady) && !readyForFlight) {
+        readyForFlight = true;
+        log("READY");
+    }
+    emit ready(readyForFlight);
 }
 
 void FlightControl::changeState(FlightControl::FlightState newState) {

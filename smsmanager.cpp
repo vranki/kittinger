@@ -15,7 +15,7 @@ SMSManager::~SMSManager() {
     gnokii.waitForFinished(5000);
 }
 
-void SMSManager::openCellular() {
+void SMSManager::init() {
     gnokii.start("gnokii --identify");
     gnokii.waitForStarted(1000);
     gnokii.waitForFinished(5000);

@@ -7,15 +7,14 @@ GPSManager::GPSManager(QObject *parent) : QObject(parent), gps_rec(0) {
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(pollGps()));
     pollTimer.setInterval(10);
     pollTimer.setSingleShot(false);
+    gotInitialFix = false;
 }
 
-GPSManager::~GPSManager()
-{
+GPSManager::~GPSManager() {
     delete gps_rec;
 }
 
-void GPSManager::openGps()
-{
+void GPSManager::init() {
     gps_rec = new gpsmm("localhost", DEFAULT_GPSD_PORT);
     lastStatus = STATUS_NO_FIX;
     lastLatitude = lastLongitude = lastAltitude = 0;
@@ -24,10 +23,12 @@ void GPSManager::openGps()
     emit gpsFix(NAN, NAN, NAN);
 
     if (!gps_rec->stream(WATCH_ENABLE|WATCH_JSON)) {
-        qDebug() << "No GPSD running.";
+        qDebug() << Q_FUNC_INFO << "Warning: no GPSD running";
+        emit ready(false);
         return;
+    } else {
+        pollTimer.start();
     }
-    pollTimer.start();
 }
 
 QString GPSManager::statusString(GpsStatus status)
@@ -45,8 +46,7 @@ QString GPSManager::statusString(GpsStatus status)
     return "?";
 }
 
-void GPSManager::pollGps()
-{
+void GPSManager::pollGps() {
     if (!gps_rec->waiting(0)) {
         return;
     }
@@ -58,16 +58,21 @@ void GPSManager::pollGps()
     }
 }
 
-void GPSManager::processData(gps_data_t *data)
-{
+void GPSManager::processData(gps_data_t *data) {
     if(lastStatus != data->status) {
         lastStatus = data->status;
         emit statusChanged(lastStatus);
     }
-    if(lastLatitude != data->fix.latitude || lastLongitude != data->fix.longitude || lastAltitude != data->fix.altitude) {
-        lastLatitude = data->fix.latitude;
-        lastLongitude = data->fix.longitude;
-        lastAltitude = data->fix.altitude;
-        emit gpsFix(lastLatitude, lastLongitude, lastAltitude);
+    if(lastStatus != STATUS_NO_FIX) {
+        if(lastLatitude != data->fix.latitude || lastLongitude != data->fix.longitude || lastAltitude != data->fix.altitude) {
+            lastLatitude = data->fix.latitude;
+            lastLongitude = data->fix.longitude;
+            lastAltitude = data->fix.altitude;
+            emit gpsFix(lastLatitude, lastLongitude, lastAltitude);
+            if(!gotInitialFix) {
+                gotInitialFix = true;
+                emit ready(true);
+            }
+        }
     }
 }

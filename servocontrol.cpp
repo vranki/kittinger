@@ -25,6 +25,7 @@ bool ServoControl::init(int min, int max) {
 }
 
 void ServoControl::setServo(int num, float pos) {
+    qDebug() << Q_FUNC_INFO << num << pos;
     if(!minValue) return; // Not initialized
     if(pos < 0 || pos > 1) {
         qDebug() << Q_FUNC_INFO << "Invalid position " << pos;
@@ -35,7 +36,6 @@ void ServoControl::setServo(int num, float pos) {
     QString outputString = QString("%1=%2\n").arg(num).arg(posValue);
     if(devFile.open(QIODevice::WriteOnly)) {
         devFile.write(outputString.toUtf8());
-        devFile.flush();
         devFile.close();
     } else {
         qDebug() << Q_FUNC_INFO << "Unable to open device file for write!";

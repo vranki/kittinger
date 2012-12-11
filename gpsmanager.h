@@ -15,9 +15,10 @@ class GPSManager : public QObject
 public:
     explicit GPSManager(QObject *parent = 0);
     ~GPSManager();
-    void openGps();
+    void init();
     static QString statusString(GpsStatus status);
 signals:
+    void ready(bool is);
     void statusChanged(GpsStatus status);
     void gpsFix(double lat, double lon, double alt);
 public slots:
@@ -32,6 +33,7 @@ private:
     double lastLatitude;
     double lastLongitude;
     double lastAltitude;
+    bool gotInitialFix;
 };
 
 #endif // GPS_H

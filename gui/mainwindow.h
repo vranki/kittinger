@@ -9,6 +9,7 @@
 #include "../flightcontrol/flightcontrol.h"
 
 class GpsSimulator;
+class SMSManager;
 
 namespace Ui {
 class MainWindow;
@@ -19,7 +20,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set);
+    explicit MainWindow(QWidget *parent, GpsSimulator *gsim, QSettings &set, GPSManager *gpsManager, SMSManager *smsManager, FlightControl *fc);
     ~MainWindow();
     Logging* log();
 public slots:

@@ -17,6 +17,10 @@
 #define MAX_GROUND_ALTITUDE 400 // in m - Landing not detected above this
 #define GPS_MAX_ALTITUDE 15000 // in m - altitude GPS should be working below
 
+class SMSManager;
+class GPSManager;
+class Logging;
+
 class FlightControl : public QObject {
     Q_OBJECT
 public:
@@ -28,7 +32,8 @@ public:
         FS_PANIC
     };
 
-    explicit FlightControl(QObject *parent = 0);
+    explicit FlightControl();
+    void init(SMSManager *sms, GPSManager *gps);
     void reset();
     static QString stateName(FlightControl::FlightState s);
 
@@ -49,7 +54,7 @@ signals:
     void survivalDetected();
     void variometerChanged(double vario);
     void flightStateChanged(FlightControl::FlightState newState);
-
+    void ready(bool is);
 private slots:
     void startTakeoff();
     void startAscent();
@@ -59,10 +64,14 @@ private slots:
     void checkForLanding();
     void missionTimeout();
 
+    void readyThermal(bool is);
+    void readySms(bool is);
+    void readyGsm(bool is);
 private:
     void changeState(FlightState newState);
     void reboot();
     void poweroff();
+    void checkReady();
 
     double lat, lon, alt;
     double variometer;
@@ -75,9 +84,9 @@ private:
     QTime missionStartTime;
     QQueue<double> lastAltFixes;
     FlightState flightState;
-    bool initialized; // All initialized
+    bool initialized, readyForFlight; // All initialized
     bool flightFinished; // Confirmed by ground crew
-
+    bool smsReady, gsmReady, thermalReady;
     ThermalControl thermalControl;
 };
 
