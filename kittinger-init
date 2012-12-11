@@ -3,15 +3,31 @@
 #
 # Copy to /etc/init.d and run update-rc.d kittinger defaults
 # To remove, use update-rc.d -f kittinger remove
+#
+# TODO: contains fixed paths
+
+### BEGIN INIT INFO
+# Provides:          kittinger
+# Required-Start:    $remote_fs $syslog $udev
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Kittinger balloon flight control
+# Description:       Kittinger balloon flight control
+### END INIT INFO
+
 case "$1" in
   start)
     echo "Starting kittinger "
+    cd /home/pi/src/PiBits/ServoBlaster
+    insmod servoblaster.ko
     cd /home/pi/src/kittinger/flightcontrol
     sudo -u pi ./kittinger >> /var/log/kittinger.log 2>&1 &
     ;;
   stop)
     echo "Stopping kittinger"
     killall kittinger
+    rmmod servoblaster
     ;;
   *)
     echo "Usage: /etc/init.d/kittinger {start|stop}"
