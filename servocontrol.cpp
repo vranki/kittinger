@@ -32,9 +32,12 @@ void ServoControl::setServo(int num, float pos) {
     }
     int posValue = ((float) (maxValue - minValue)) * pos;
     posValue += minValue;
-    QString outputString = QString("%1=%2").arg(num).arg(posValue);
-    devFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&devFile);
-    out << outputString;
-    devFile.close();
+    QString outputString = QString("%1=%2\n").arg(num).arg(posValue);
+    if(devFile.open(QIODevice::WriteOnly)) {
+        devFile.write(outputString.toUtf8());
+        devFile.flush();
+        devFile.close();
+    } else {
+        qDebug() << Q_FUNC_INFO << "Unable to open device file for write!";
+    }
 }
