@@ -40,19 +40,20 @@ int main (int argc, char *argv[]) {
         return 1 ;
     }
     // Turn on servo power
-    pinMode (1, OUTPUT);
-    digitalWrite (1, true);
+    pinMode (17, OUTPUT);
+    digitalWrite (17, true);
 
     // Setup pwm
-    softServoSetup (0, -1, -1, -1, -1, -1, -1, -1) ;
+    pinMode(4, OUTPUT);
+    softServoSetup (-1, -1, -1, -1, value, -1, -1, -1) ;
     softServoWrite (0,  value);
 
     // Send pwm for a while
-    for (int i=0;i<100;i++)
+    for (int i=0;i<1000;i++)
         delay(10);
 
     // Turn off power
-    digitalWrite (1, false);
+    digitalWrite (17, false);
 
     // then quit
     return EXIT_SUCCESS;
