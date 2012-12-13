@@ -8,8 +8,8 @@
 #include "../thermalcontrol.h"
 
 #define VARIOMETER_FIXES 5
-#define VERTICAL_SPEED_DEADZONE 1
-#define MESSAGE_INTERVAL 20 // in sec
+#define VERTICAL_SPEED_DEADZONE 5 // assume ascent/descent if outside thise
+#define MESSAGE_INTERVAL 60 // in sec
 #define GSM_POLL_INTERVAL 10*1000 // in msec
 #define GSM_POLL_ALTITUDE 1000 // in m - Altitude above which GSM has no chance of working
 #define MAX_MISSION_TIME 4*60*60*1000 // in msec

@@ -6,6 +6,7 @@ SMSManager::SMSManager(QObject *parent) : QObject(parent) {
     gnokii.setProcessChannelMode(QProcess::MergedChannels);
     simulate = true;
     deviceAvailable = false;
+    gotRf = false;
 }
 
 SMSManager::~SMSManager() {
@@ -28,7 +29,6 @@ void SMSManager::init() {
     }
     if(!deviceAvailable)
         qDebug() << Q_FUNC_INFO << "Warning: Device is not available";
-    emit ready(deviceAvailable);
 }
 
 void SMSManager::pollStatus() {
@@ -40,12 +40,17 @@ void SMSManager::pollStatus() {
         QString line = gnokii.readLine();
         if(line.startsWith("RFLevel: ")) {
             QString levelString = line.mid(9);
-            qDebug() << Q_FUNC_INFO << "RF Level: " << levelString;
+            qDebug() << Q_FUNC_INFO << "RF Level: " << levelString.trimmed();
             int level = -1;
             bool ok;
             level = levelString.toInt(&ok);
-            if(ok)
+            if(ok) {
                 emit rfLevel(level);
+                if(level > 0 && !gotRf) {
+                    emit ready(true);
+                    gotRf = true;
+                }
+            }
         } else if(line.startsWith("SMS Messages:")) {
             QString numberString = line.mid(line.lastIndexOf(" "));
             int smsms = numberString.toInt();

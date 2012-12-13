@@ -34,7 +34,7 @@ private:
 
     QProcess gnokii;
     QString number;
-    bool simulate, deviceAvailable;
+    bool simulate, deviceAvailable, gotRf;
     QStringList injectedMessages;
 };
 
