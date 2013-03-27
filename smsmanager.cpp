@@ -41,7 +41,7 @@ void SMSManager::pollStatus() {
         QString line = gnokii.readLine();
         if(line.startsWith("RFLevel: ")) {
             QString levelString = line.mid(9);
-            qDebug() << Q_FUNC_INFO << "RF Level: " << levelString;
+            qDebug() << Q_FUNC_INFO << "RF Level: " << levelString.trimmed();
             int level = -1;
             bool ok;
             level = levelString.toInt(&ok);
