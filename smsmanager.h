@@ -15,7 +15,7 @@ class SMSManager : public QObject
 public:
     explicit SMSManager(QObject *parent = 0);
     ~SMSManager();
-    void openCellular();
+    void init();
     void setSmsNumber(QString num);
     void setSimulate(bool sim);
 public slots:
@@ -34,7 +34,7 @@ private:
 
     QProcess gnokii;
     QString number;
-    bool simulate, deviceAvailable;
+    bool simulate, deviceAvailable, gotRf;
     QStringList injectedMessages;
 };
 

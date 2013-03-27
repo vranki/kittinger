@@ -6,6 +6,7 @@ SMSManager::SMSManager(QObject *parent) : QObject(parent) {
     gnokii.setProcessChannelMode(QProcess::MergedChannels);
     simulate = true;
     deviceAvailable = false;
+    gotRf = false;
 }
 
 SMSManager::~SMSManager() {
@@ -15,8 +16,7 @@ SMSManager::~SMSManager() {
     gnokii.waitForFinished(5000);
 }
 
-void SMSManager::openCellular()
-{
+void SMSManager::init() {
     gnokii.start("gnokii --identify");
     gnokii.waitForStarted(1000);
     gnokii.waitForFinished(5000);
@@ -28,8 +28,7 @@ void SMSManager::openCellular()
         }
     }
     if(!deviceAvailable)
-        qDebug() << Q_FUNC_INFO << "Warning: Device is available";
-    emit ready(deviceAvailable);
+        qDebug() << Q_FUNC_INFO << "Warning: Device is not available";
 }
 
 void SMSManager::pollStatus() {
@@ -45,8 +44,13 @@ void SMSManager::pollStatus() {
             int level = -1;
             bool ok;
             level = levelString.toInt(&ok);
-            if(ok)
+            if(ok) {
                 emit rfLevel(level);
+                if(level > 0 && !gotRf) {
+                    emit ready(true);
+                    gotRf = true;
+                }
+            }
         } else if(line.startsWith("SMS Messages:")) {
             QString numberString = line.mid(line.lastIndexOf(" "));
             int smsms = numberString.toInt();

@@ -96,6 +96,16 @@
              </item>
             </widget>
            </item>
+           <item row="4" column="0">
+            <widget class="QCheckBox" name="gpsReadyCheckbox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Ready</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
@@ -200,27 +210,37 @@
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="label_9">
            <property name="text">
             <string>RF Level</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QLabel" name="rfLevelLabel">
            <property name="text">
             <string>?</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLineEdit" name="injectMessageEdit"/>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QPushButton" name="sendSmsButton">
            <property name="text">
             <string>Send SMS</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="smsReadyCheckbox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Ready</string>
            </property>
           </widget>
          </item>
@@ -265,31 +285,41 @@
        <string>Flight Control</string>
       </property>
       <layout class="QFormLayout" name="formLayout_4">
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
           <string>Flight Phase</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QLabel" name="phaseLabel">
          <property name="text">
           <string>?</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_11">
          <property name="text">
           <string>Variometer</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="QLineEdit" name="variometerValue">
          <property name="enabled">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="flightReadyCheckbox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Ready</string>
          </property>
         </widget>
        </item>

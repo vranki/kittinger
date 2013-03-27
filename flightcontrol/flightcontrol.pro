@@ -15,9 +15,13 @@ SOURCES += main.cpp\
     ../gpsmanager.cpp \
     ../smsmanager.cpp \
     ../logging.cpp \
+    ../thermalcontrol.cpp \
+    ../servocontrol.cpp \
     flightcontrol.cpp
 
 HEADERS  += ../gpsmanager.h \
     ../smsmanager.h \
     ../logging.h \
+    ../thermalcontrol.h \
+    ../servocontrol.h \
     flightcontrol.h
