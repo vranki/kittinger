@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "gpssimulator.h"
 #include "../smsmanager.h"
-#include <QWebFrame>
+#include <QtWebKitWidgets/QWebFrame>
 #include "settingsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent, GpsSimulator *gsim,

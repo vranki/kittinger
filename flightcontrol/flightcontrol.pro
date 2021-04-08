@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core gui widgets
 
 TARGET = kittinger
 TEMPLATE = app

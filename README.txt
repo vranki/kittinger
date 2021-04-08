@@ -1,17 +1,19 @@
-kittinger
+Kittinger
 =========
+
 
 Stratosphere balloon flight software and simulator
 
+Note: Looking for new maintainer
+
 Target hw: Raspberry Pi
 
-
 To build:
-
-sudo apt-get install libgps-dev libgnokii-dev libqt4-dev
+```bash
+sudo apt-get install libgps-dev libgnokii-dev libqt5webkit5-dev qtbase5-dev
 qmake
 make
-
+```
 
 
 ** Setting up persistent USB device names **

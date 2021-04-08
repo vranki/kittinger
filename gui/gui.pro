@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkit
+QT       += core gui webkit widgets webkitwidgets
 
 TARGET = kittinger-gui
 TEMPLATE = app

@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QSettings>
-#include <QtGui/QTextEdit>
+#include <QtWidgets/QTextEdit>
 #include "../gpsmanager.h"
 #include "../logging.h"
 #include "../flightcontrol/flightcontrol.h"
